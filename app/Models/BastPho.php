@@ -9,7 +9,8 @@ class BastPho extends Model
 {
     use HasFactory;
 
-    protected $guarded = ['id'];
+    protected $table = 'bast_pho';
+    protected $fillable = ['nomor', 'tanggal'];
 
     public function Pagu()
     {

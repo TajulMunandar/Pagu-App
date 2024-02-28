@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreBastPhoRequest;
 use App\Models\BastPho;
 use App\Models\Pagu;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class BastPhoController extends Controller
 {
@@ -20,32 +22,20 @@ class BastPhoController extends Controller
     }
 
     /**
+     * Store a newly created resource in storage.
+     */
+    public function store(StoreBastPhoRequest $request)
+    {
+        BastPho::create($request->validated());
+        return redirect()->back()->with('success', 'Bast baru berhasil ditambahkan!');
+    }
+
+    /**
      * Show the form for creating a new resource.
      */
     public function create()
     {
         //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        try {
-            $validatedData = $request->validate([
-                'nomor' => 'required',
-                'pagu_id' => 'required',
-                'tanggal' => 'required',
-                'ket' => 'required',
-            ]);
-        } catch (\Illuminate\Validation\ValidationException $exception) {
-            return redirect()->back()->with('failed', $exception->getMessage());
-        }
-
-        BastPho::create($validatedData);
-
-        return redirect()->back()->with('success', 'Bast baru berhasil ditambahkan!');
     }
 
     /**
@@ -79,10 +69,10 @@ class BastPhoController extends Controller
 
             $validatedData = $this->validate($request, $rules);
 
-            BastPho::where('id', $bast_pho->id)->update($validatedData);
+            BastPho::find($bast_pho->id)->update($validatedData);
 
             return redirect()->back()->with('success', "Data Bast Pho $bast_pho->nomor berhasil diperbarui!");
-        } catch (\Illuminate\Validation\ValidationException $exception) {
+        } catch (ValidationException $exception) {
             return redirect()->back()->with('failed', 'Data gagal diperbarui! ' . $exception->getMessage());
         }
     }
@@ -94,7 +84,7 @@ class BastPhoController extends Controller
     {
         try {
             BastPho::destroy($bast_pho->id);
-        } catch (\Illuminate\Database\QueryException $e) {
+        } catch (QueryException $e) {
             if ($e->getCode() == 23000) {
                 //SQLSTATE[23000]: Integrity constraint violation
                 return redirect()->back()->with('failed', "Bast Pho $bast_pho->nomor tidak dapat dihapus, karena sedang digunakan!");

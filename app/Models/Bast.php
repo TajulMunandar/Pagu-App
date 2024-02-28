@@ -9,7 +9,8 @@ class Bast extends Model
 {
     use HasFactory;
 
-    protected $guarded = ['id'];
+    protected $table = 'bast';
+    protected $fillable = ['nomor', 'tanggal'];
 
     public function Pagu()
     {
